@@ -32,8 +32,12 @@ FactoryGirl.define do
   factory :card do
      title Faker::Lorem.words(5)
      description Faker::Lorem.sentences(4)
-     price rand(400..600)
-     inventory rand(0..10)
+     price Random.rand(400..600)
+     inventory Random.rand(0..10)
+  end
+
+  factory :tag do
+    name Faker::Lorem.word
   end
 
   factory :occasion do
