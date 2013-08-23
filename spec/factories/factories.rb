@@ -10,6 +10,7 @@ FactoryGirl.define do
   end
 
   factory :user do
+    id 1
     first_name Faker::Name.first_name
     last_name Faker::Name.last_name
     email Faker::Internet.email
@@ -50,6 +51,7 @@ FactoryGirl.define do
     sequence(:user_id) { |n| n }
     sequence(:occasion_id) { |n| n }
     sequence(:card_id) { |n| n }
+    sequence(:created_at) {|n| }
     lead_time 604800
     status "in_cart"
   end
