@@ -3,6 +3,8 @@ ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'rspec/autorun'
+require 'vcr'
+require_relative '../config/facebook_accesstoken_for_rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -45,3 +47,9 @@ RSpec.configure do |config|
 end
 
 FactoryGirl.find_definitions
+
+VCR.configure do |c|
+  c.cassette_library_dir = 'vcr_cassettes'
+  c.hook_into :webmock
+  c.filter_sensitive_data('<URI>') {'https://graph.facebook.com/me/friends?access_token='+"#{ACCESS_TOKEN}"+'&fields=name,birthday,picture'}
+end
