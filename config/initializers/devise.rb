@@ -20,7 +20,7 @@ Devise.setup do |config|
   config.omniauth :facebook, devise_config['facebook_key'], devise_config['facebook_secret'], {:scope => "friends_birthday, email"}
 	# config.omniauth :facebook, ENV['FACEBOOK_ID'], ENV['FACEBOOK_SECRET']
   config.omniauth :google_oauth2, devise_config['google_oauth2_key'], devise_config['google_oauth2_secret'], { access_type: "offline", approval_prompt: "" }
-
+  config.secret_key = devise_config['devise_secret_key']
 
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,

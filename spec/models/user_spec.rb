@@ -95,9 +95,71 @@ describe User do
         @order3.should_not_receive(:event_date)
 
         expect(user.upcoming_orders).to eq([@order2])
-        
       end
     end
   end
+
+  describe "facebook methods" do
+    before :each do 
+      @dummy_token = "dummy_access_token"
+      @access_token = ACCESS_TOKEN
+    end
+
+    it "#facebook without block" do
+      user.stub_chain(:authentications,:find_by_provider, :oauth_token).and_return(@dummy_token)
+      api_instance = Koala::Facebook::API.new(@dummy_token)
+      (user.facebook.class).should == api_instance.class
+    end
+
+    it "#facebook with a block" do
+      user.stub_chain(:authentications,:find_by_provider, :oauth_token).and_return(@dummy_token)
+      api_instance_string = "--- !ruby/object:Koala::Facebook::API\naccess_token: " + @dummy_token + "\n"
+      (user.facebook { |fb| fb.to_yaml }).should eql(api_instance_string)
+    end
+
+    describe "#get_facebook_friends" do
+      it "should return list of friends" do
+        user.stub_chain(:authentications,:find_by_provider, :oauth_token).and_return(@access_token)
+        
+        VCR.use_cassette('user/get_facebook_friends', record: :new_episodes) do
+          user.get_facebook_friends.first.keys.should eql(["name","birthday","id","picture"])
+        end      
+      end
+    end
+
+    describe "#authenticated_with_facebook?" do
+      it "returns true if user facebook authentication has not expired" do
+        user.stub_chain(:authentications, :find_by_provider).and_return(true)
+        user.stub_chain(:authentications, :find_by_provider, :oauth_expires_at).and_return(Time.now + 2.days)
+        
+        expect(user.authenticated_with_facebook?).to be_true
+      end
+
+      it "returns false if user facebook authentication has expired" do
+        user.stub_chain(:authentications, :find_by_provider).and_return(true)
+        user.stub_chain(:authentications, :find_by_provider, :oauth_expires_at).and_return(Time.now - 2.days)
+
+        expect(user.authenticated_with_facebook?).to be_false
+      end
+
+      it "returns false when user facebook authentication does not exist" do
+        user.stub_chain(:authentications, :find_by_provider).and_return(false)
+
+        expect(user.authenticated_with_facebook?).to be_false
+      end
+
+    end
+
+    describe "#send_welcome_email" do
+      it "calls UserMailer with the user object" do
+        UserMailer.should_receive(:welcome_email).with(user)
+        UserMailer.stub_chain(:welcome_email, :deliver)
+        user.send_welcome_email
+      end
+    end
+
+  end 
+
+
 
 end

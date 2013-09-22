@@ -38,6 +38,8 @@ group :test do
   gem 'database_cleaner'
   gem 'shoulda'
   gem 'mocha'
+  gem 'vcr'
+  gem 'webmock'
 end
 
 group :development do
