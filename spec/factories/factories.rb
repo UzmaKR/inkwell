@@ -54,5 +54,13 @@ FactoryGirl.define do
     lead_time 604800
     status "in_cart"
   end
+
+  factory :authentication do
+    user_id 1
+    provider "facebook"
+    uid "725231096"
+    oauth_token "dummy_token"
+    oauth_expires_at Time.now + 10.days
+  end
     
 end
