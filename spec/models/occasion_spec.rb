@@ -19,12 +19,31 @@ describe Occasion do
   	end
   end
   
-  describe "#create_order" do
-  	before do
-  		occasion.stub_chain(:friend, :user, :id).and_return(user.id)
+  describe "when first creating an occasion" do
+  	before { occasion.stub_chain(:friend, :user, :id).and_return(user.id) }
+
+  	context "without a friend" do
+  		it "creates a friend" do
+  			occasion.should_receive(:friend).and_return(false)
+  			expect {occasion.save}.to change{Friend.count}.by(1)
+  		end
   	end
 
-  	context "when first creating an occasion" do
+  	context "with a friend" do
+  		
+  			let!(:occasion2) {build(:occasion, friend_name: "Polly", user_id: 89)}
+  			let!(:friend2) {create(:friend, name: "Polly", user_id: 89)}
+ 
+  		it "it will not create a friend" do
+  			occasion2.stub_chain(:friend, :user, :id).and_return(user.id)
+  			occasion2.should_receive(:friend).and_return(false)
+  			Friend.should_receive(:where).and_return([friend2])
+  			expect {occasion2.save}.to change{Friend.count}.by(0)
+  		end
+  	end
+
+
+  	context "#create_order" do
 
   		it "an order gets created" do
   			expect {occasion.save}.to change{Order.count}.by(1)
